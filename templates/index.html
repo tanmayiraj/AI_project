@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Screener</title>
+</head>
+<body>
+
+<h2>AI Resume Screening System</h2>
+
+<form method="POST">
+    <label>Enter Job Description:</label><br><br>
+    <textarea name="job_desc" rows="6" cols="60"></textarea>
+    <br><br>
+    <button type="submit">Analyze Resumes</button>
+</form>
+
+{% if results %}
+<h3>Ranking Results:</h3>
+<ul>
+{% for file, score in results %}
+    <li>{{file}} - {{score}}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+</body>
+</html>
