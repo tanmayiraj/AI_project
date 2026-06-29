@@ -21,8 +21,12 @@ class Settings(BaseSettings):
     def SQLALCHEMY_DATABASE_URI(self) -> str:
         return f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
-    # External APIs
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    
+    # Upload Settings
+    UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "app/uploads")
+    MAX_UPLOAD_SIZE: int = int(os.getenv("MAX_UPLOAD_SIZE", "5242880")) # 5MB
+    ALLOWED_EXTENSIONS: list = [".pdf"]
 
     model_config = SettingsConfigDict(case_sensitive=True)
 

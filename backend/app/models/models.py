@@ -21,6 +21,8 @@ class Resume(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    original_filename = Column(String, nullable=False)
+    stored_filename = Column(String, nullable=False, unique=True)
     file_path = Column(String, nullable=False)
     parsed_content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
