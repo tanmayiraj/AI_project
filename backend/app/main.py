@@ -6,11 +6,9 @@ from app.core.config import settings
 from app.db.database import engine, Base
 from app.models import models
 from app.middleware.logging import LoggingMiddleware
-from app.core.exceptions import FileValidationException, DuplicateUploadException, ResumeNotFoundException
+from app.core.exceptions import FileValidationException, DuplicateUploadException, ResumeNotFoundException, GeminiAPIException
 
-# NOTE: Dropping tables first during Sprint 1 transition since we added a column
-# In production, use Alembic migrations instead.
-Base.metadata.drop_all(bind=engine)
+# Use create_all to seamlessly add the new ResumeAnalysis table
 Base.metadata.create_all(bind=engine)
 
 # Ensure upload directory exists on startup
@@ -57,11 +55,30 @@ async def resume_not_found_exception_handler(request: Request, exc: ResumeNotFou
         content={"detail": exc.detail},
     )
 
+@app.exception_handler(GeminiAPIException)
+async def gemini_api_exception_handler(request: Request, exc: GeminiAPIException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": exc.error,
+            "message": exc.message
+        }
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled Exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred. Please try again later."}
+    )
+
 @app.get("/")
 def root():
     return {"message": "Welcome to AI Career Copilot API"}
 
-from app.api.v1 import auth, resume
+from app.api.v1 import auth, resume, dashboard, job, intelligence
 
 # Include routers
 app.include_router(
@@ -74,4 +91,22 @@ app.include_router(
     resume.router,
     prefix=f"{settings.API_V1_STR}/resume",
     tags=["Resume"],
+)
+
+app.include_router(
+    dashboard.router,
+    prefix=f"{settings.API_V1_STR}/dashboard",
+    tags=["Dashboard"],
+)
+
+app.include_router(
+    job.router,
+    prefix=f"{settings.API_V1_STR}/job",
+    tags=["Job"],
+)
+
+app.include_router(
+    intelligence.router,
+    prefix=f"{settings.API_V1_STR}/intelligence",
+    tags=["Intelligence"],
 )

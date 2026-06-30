@@ -66,3 +66,16 @@ async def delete_resume(
 ):
     ResumeService.delete_resume(db, resume_id, current_user.id)
     return None
+
+@router.post(
+    "/analyze/{resume_id}",
+    summary="Analyze a resume",
+    description="Uses Gemini AI to extract information, categorize skills, and score the resume."
+)
+async def analyze_resume(
+    resume_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    from app.services.resume_analyzer import ResumeAnalyzer
+    return ResumeAnalyzer.analyze_and_store(db, resume_id, current_user.id)

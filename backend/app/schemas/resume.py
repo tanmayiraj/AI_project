@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from uuid import UUID
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 class ResumeBase(BaseModel):
     original_filename: str = Field(..., description="The original name of the uploaded file.")
@@ -13,6 +13,7 @@ class ResumeResponse(ResumeBase):
     file_path: str = Field(..., description="The relative path to the stored file.")
     created_at: datetime = Field(..., description="The timestamp when the resume was uploaded.")
     parsed_content: Optional[str] = Field(None, description="The extracted text from the resume (may be omitted in list views).")
+    analysis: Any = Field(None, description="The AI analysis data if generated.")
 
     model_config = ConfigDict(from_attributes=True)
 

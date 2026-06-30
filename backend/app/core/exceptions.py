@@ -11,3 +11,10 @@ class DuplicateUploadException(HTTPException):
 class ResumeNotFoundException(HTTPException):
     def __init__(self, detail: str = "Resume not found."):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
+
+class GeminiAPIException(Exception):
+    def __init__(self, status_code: int, error: str, message: str):
+        self.status_code = status_code
+        self.error = error
+        self.message = message
+        super().__init__(message)
