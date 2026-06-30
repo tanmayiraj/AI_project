@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import api from '../services/api';
+import { apiService } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
-      api.get('/auth/me')
+      apiService.getMe()
         .then(response => {
           setUser(response.data);
         })
@@ -26,13 +26,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password, rememberMe) => {
-    const formData = new FormData();
+    const formData = new URLSearchParams();
     formData.append('username', email);
     formData.append('password', password);
     
-    const response = await api.post('/auth/login', formData, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
+    const response = await apiService.login(formData);
     
     const token = response.data.access_token;
     if (rememberMe) {
@@ -41,12 +39,12 @@ export const AuthProvider = ({ children }) => {
       sessionStorage.setItem('token', token);
     }
     
-    const userResp = await api.get('/auth/me');
+    const userResp = await apiService.getMe();
     setUser(userResp.data);
   };
 
   const register = async (email, password) => {
-    await api.post('/auth/register', { email, password });
+    await apiService.register({ email, password });
   };
 
   const logout = () => {
