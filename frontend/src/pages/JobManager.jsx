@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
+import { motion } from 'framer-motion';
 
 export default function JobManager() {
   const [jobs, setJobs] = useState([]);
@@ -145,7 +146,12 @@ export default function JobManager() {
   );
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.3 }}
+      className="space-y-6 max-w-6xl mx-auto"
+    >
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Job Manager</h1>
         <p className="text-muted-foreground">Manage your target job descriptions for AI matching.</p>
@@ -271,44 +277,46 @@ export default function JobManager() {
             ) : (
               <div className="grid gap-3">
                 {currentJobs.map((job) => (
-                  <div key={job.id} className="bg-card border border-border rounded-xl p-4 sm:p-6 shadow-sm hover:border-primary/30 transition-colors flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div className="flex items-start gap-4 overflow-hidden w-full">
-                      <div className="p-3 bg-secondary rounded-lg shrink-0 text-primary hidden sm:block">
-                        <Briefcase className="w-6 h-6" />
-                      </div>
-                      <div className="overflow-hidden w-full">
-                        <h4 className="font-semibold text-foreground truncate">{job.title}</h4>
-                        {job.company && <p className="text-sm font-medium text-muted-foreground truncate">{job.company}</p>}
-                        <div className="flex gap-2 sm:gap-4 mt-2 flex-wrap">
-                          <p className="text-xs text-muted-foreground">
-                            Added: {new Date(job.created_at).toLocaleDateString()}
-                          </p>
-                          {job.experience && (
-                            <p className="text-xs px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full border border-border">
-                              Exp: {job.experience}
+                  <motion.div key={job.id} whileHover={{ scale: 1.01 }} transition={{ type: "spring", stiffness: 300 }}>
+                    <div className="bg-card border border-border rounded-xl p-4 sm:p-6 shadow-sm hover:border-primary/30 transition-colors flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex items-start gap-4 overflow-hidden w-full">
+                        <div className="p-3 bg-secondary rounded-lg shrink-0 text-primary hidden sm:block">
+                          <Briefcase className="w-6 h-6" />
+                        </div>
+                        <div className="overflow-hidden w-full">
+                          <h4 className="font-semibold text-foreground truncate">{job.title}</h4>
+                          {job.company && <p className="text-sm font-medium text-muted-foreground truncate">{job.company}</p>}
+                          <div className="flex gap-2 sm:gap-4 mt-2 flex-wrap">
+                            <p className="text-xs text-muted-foreground">
+                              Added: {new Date(job.created_at).toLocaleDateString()}
                             </p>
-                          )}
-                          {job.salary && (
-                            <p className="text-xs px-2 py-0.5 bg-green-500/10 text-green-500 rounded-full border border-green-500/20">
-                              {job.salary}
-                            </p>
-                          )}
+                            {job.experience && (
+                              <p className="text-xs px-2 py-0.5 bg-secondary text-secondary-foreground rounded-full border border-border">
+                                Exp: {job.experience}
+                              </p>
+                            )}
+                            {job.salary && (
+                              <p className="text-xs px-2 py-0.5 bg-green-500/10 text-green-500 rounded-full border border-green-500/20">
+                                {job.salary}
+                              </p>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                      <Link to={`/jobs/${job.id}`}>
-                        <Button variant="outline" size="sm">
-                          <Eye className="w-4 h-4 mr-2" />
-                          Details
+                      
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                        <Link to={`/jobs/${job.id}`}>
+                          <Button variant="outline" size="sm">
+                            <Eye className="w-4 h-4 mr-2" />
+                            Details
+                          </Button>
+                        </Link>
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(job.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <Trash2 className="w-4 h-4" />
                         </Button>
-                      </Link>
-                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(job.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -336,6 +344,6 @@ export default function JobManager() {
         onCancel={() => setDeleteId(null)}
         isLoading={deleting}
       />
-    </div>
+    </motion.div>
   );
 }

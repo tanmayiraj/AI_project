@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
+import { motion } from 'framer-motion';
 
 export default function ResumeManager() {
   const [resumes, setResumes] = useState([]);
@@ -125,7 +126,12 @@ export default function ResumeManager() {
   );
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.3 }}
+      className="space-y-6 max-w-5xl mx-auto"
+    >
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Resume Manager</h1>
         <p className="text-muted-foreground">Upload and manage your resumes for AI analysis.</p>
@@ -193,46 +199,48 @@ export default function ResumeManager() {
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {currentResumes.map(resume => (
-              <Card key={resume.id} className="hover:border-primary/50 transition-colors">
-                <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 bg-primary/10 rounded-lg text-primary shrink-0">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground truncate max-w-[200px] sm:max-w-sm">{resume.original_filename}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Uploaded on{" "}
-                        {resume.created_at
-                          ? new Date(resume.created_at).toLocaleDateString()
-                          : "Unknown"}
-                      </p>
+              <motion.div key={resume.id} whileHover={{ scale: 1.01 }} transition={{ type: "spring", stiffness: 300 }}>
+                <Card className="hover:border-primary/50 transition-colors">
+                  <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-primary/10 rounded-lg text-primary shrink-0">
+                        <FileText className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground truncate max-w-[200px] sm:max-w-sm">{resume.original_filename}</h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Uploaded on{" "}
+                          {resume.created_at
+                            ? new Date(resume.created_at).toLocaleDateString()
+                            : "Unknown"}
+                        </p>
 
-                      {resume.analysis && (
-                        <div className="mt-2 text-xs font-medium text-green-500 bg-green-500/10 px-2 py-1 rounded w-max border border-green-500/20">
-                          ATS Score: {resume.analysis.ats_score}/100
-                        </div>
-                      )}
+                        {resume.analysis && (
+                          <div className="mt-2 text-xs font-medium text-green-500 bg-green-500/10 px-2 py-1 rounded w-max border border-green-500/20">
+                            ATS Score: {resume.analysis.ats_score}/100
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                    <Button variant="secondary" size="sm" onClick={() => handleAnalyze(resume.id)}>
-                      <Play className="w-4 h-4 mr-2" />
-                      Analyze
-                    </Button>
-                    <Link to={`/resumes/${resume.id}`}>
-                      <Button variant="outline" size="sm">
-                        <Eye className="w-4 h-4 mr-2" />
-                        Details
+                    <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                      <Button variant="secondary" size="sm" onClick={() => handleAnalyze(resume.id)}>
+                        <Play className="w-4 h-4 mr-2" />
+                        Analyze
                       </Button>
-                    </Link>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => setDeleteId(resume.id)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                      <Link to={`/resumes/${resume.id}`}>
+                        <Button variant="outline" size="sm">
+                          <Eye className="w-4 h-4 mr-2" />
+                          Details
+                        </Button>
+                      </Link>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10" onClick={() => setDeleteId(resume.id)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         )}
@@ -258,6 +266,6 @@ export default function ResumeManager() {
         onCancel={() => setDeleteId(null)}
         isLoading={deleting}
       />
-    </div>
+    </motion.div>
   );
 }

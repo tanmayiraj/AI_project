@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { apiService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { FileText, Upload, Settings, Target, Zap, TrendingUp, Activity, Briefcase } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Link } from 'react-router-dom';
 import { LoadingSkeleton } from '../components/ui/LoadingSkeleton';
+import { motion } from 'framer-motion';
 
 import {
   Chart as ChartJS,
@@ -33,6 +34,10 @@ ChartJS.register(
   Filler,
   ArcElement
 );
+
+// Memoized charts to improve performance
+const MemoizedLineChart = memo(({ data, options }) => <Line data={data} options={options} />);
+const MemoizedDoughnutChart = memo(({ data, options }) => <Doughnut data={data} options={options} />);
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -129,7 +134,12 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="space-y-6 max-w-7xl mx-auto pb-12"
+    >
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Overview</h1>
         <p className="text-muted-foreground">Welcome back, {user?.email?.split('@')[0] || 'User'}! Here's your career progress.</p>
@@ -229,7 +239,7 @@ export default function Dashboard() {
           <CardContent>
             {data.ats_trend && data.ats_trend.length > 0 ? (
               <div className="h-72 w-full">
-                <Line data={lineChartData} options={chartOptions} />
+                <MemoizedLineChart data={lineChartData} options={chartOptions} />
               </div>
             ) : (
               <div className="h-72 flex flex-col items-center justify-center text-muted-foreground border border-dashed border-border rounded-lg">
@@ -250,7 +260,7 @@ export default function Dashboard() {
           <CardContent className="flex-1 flex flex-col items-center justify-center">
             {data.most_common_skills && data.most_common_skills.length > 0 ? (
               <div className="h-64 w-full relative">
-                <Doughnut data={doughnutData} options={doughnutOptions} />
+                <MemoizedDoughnutChart data={doughnutData} options={doughnutOptions} />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none mb-6">
                   <span className="text-2xl font-bold">{data.most_common_skills.length}</span>
                 </div>
@@ -321,6 +331,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </motion.div>
   );
 }
